@@ -112,7 +112,7 @@ Result_2 <- do.call(rbind.data.frame, Res_2)
 # SNP:  genotype data 
 # covar_outcomes: includes covariates and outcomes for survival analysis
 
-res <- apply(SNP, 2, fit_fun, covar_outcomes)
+res <- apply(SNP, 2, fit_snp_os, covar_outcomes)
 Res <- t(res)
 colnames(Res) <- c( "coef", "exp_coef", "se", "z", "p_val", "lower_CI_95", "upper_CI_95")
 
