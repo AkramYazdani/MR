@@ -1,0 +1,44 @@
+######  KM plot
+data_cet <- data[data$Arm == 2, ]
+surv_object_cet <- Surv(time = data_cet$fu_time, event = data_cet$dead)
+data_cet$KM_gene <- ifelse(data_cet$gene > quantile(data_cet$gene)[3], 1, 0)
+
+km_fit_cet <- survfit(surv_object_cet ~ KM_gene, data = data_cet)
+
+ggsurvplot(km_fit_cet,
+           data = data_cet,
+           pval = TRUE,             # Display p-value for log-rank test
+           #conf.int = TRUE,         # Show confidence intervals
+           risk.table = TRUE,       # Add a risk table
+           legend.title = "gene",    # Legend title
+           legend.labs = c("Low", "High"),  # Legend labels
+           xlab = "Time (months)",    # Label for x-axis
+           ylab = "Survival Probability",
+           surv.median.line = "hv",# Label for y-axis
+           palette = c("#E7B800", "#2E9FDF")) 
+
+
+######  boxplot
+library(reshape2)
+library(dplyr)
+library(ggplot2)
+# tumor_barplot : includes the normalized gene expression of the targeted genes from tumor samples
+# normal_barplot : includes the normalized gene expression of the targeted genes  from normal samples
+
+data_barplot <- rbind(normal_barplot, tumor_barplot)
+long_data <- melt(data_barplot, id.vars = "condition", variable.name = "Gene", value.name = "Expression")
+
+ggplot(long_data, aes(x = Gene, y = Expression, fill = condition)) +
+  geom_boxplot() +
+  labs(
+    title = "Expression of the genes with a causal impact on OS \n GSE146889",
+    x = "Gene",
+    y = "Expression"
+  ) +
+  scale_fill_manual(values = c("#1f77b4", "#ff7f0e")) +  # Optional custom colors
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    axis.title = element_text(size = 12),
+    legend.title = element_blank()
+  )
